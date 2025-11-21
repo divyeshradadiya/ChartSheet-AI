@@ -42,8 +42,8 @@ export default function UploadSection({
   };
 
   return (
-    <div className="border-b pb-4 mb-4">
-      <div className="flex items-center gap-2 mb-3">
+    <div className="border-b pb-3 mb-3 shrink-0">
+      <div className="flex items-center gap-2 mb-2">
         <input
           type="file"
           accept=".csv"
@@ -52,7 +52,7 @@ export default function UploadSection({
           id="csv-upload"
         />
         <label htmlFor="csv-upload">
-          <Button asChild>
+          <Button asChild size="sm">
             <span className="cursor-pointer">
               <Upload className="w-4 h-4 mr-2" />
               Upload CSV
@@ -62,11 +62,11 @@ export default function UploadSection({
 
         {hasData && (
           <>
-            <Button variant="outline" onClick={onDownload}>
+            <Button variant="outline" size="sm" onClick={onDownload}>
               <Download className="w-4 h-4 mr-2" />
               Download
             </Button>
-            <Button variant="outline" onClick={onClear}>
+            <Button variant="outline" size="sm" onClick={onClear}>
               <X className="w-4 h-4 mr-2" />
               Clear
             </Button>
@@ -75,40 +75,40 @@ export default function UploadSection({
       </div>
 
       {!hasData && (
-        <div className="flex flex-wrap gap-2">
-          <span className="text-sm text-muted-foreground">
+        <div className="flex flex-wrap gap-2 items-center">
+          <span className="text-xs text-muted-foreground">
             Or try demo files:
           </span>
           <Button
             variant="link"
             size="sm"
             onClick={() => loadDemoFile("/demo-people.csv")}
-            className="h-auto p-0 text-sm"
+            className="h-auto p-0 text-xs"
           >
-            People Data
+            People
           </Button>
           <Button
             variant="link"
             size="sm"
             onClick={() => loadDemoFile("/demo-sales.csv")}
-            className="h-auto p-0 text-sm"
+            className="h-auto p-0 text-xs"
           >
-            Sales Data
+            Sales
           </Button>
           <Button
             variant="link"
             size="sm"
             onClick={() => loadDemoFile("/demo-expenses.csv")}
-            className="h-auto p-0 text-sm"
+            className="h-auto p-0 text-xs"
           >
-            Expenses Data
+            Expenses
           </Button>
         </div>
       )}
 
       {filename && (
-        <div className="mt-2 text-sm text-muted-foreground">
-          Current file: <span className="font-medium">{filename}</span>
+        <div className="mt-1 text-xs text-muted-foreground">
+          Current: <span className="font-medium">{filename}</span>
         </div>
       )}
     </div>

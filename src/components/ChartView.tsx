@@ -75,9 +75,9 @@ export default function ChartView({ config }: ChartViewProps) {
   };
 
   return (
-    <Card className="p-4 h-full">
-      <div className="h-[calc(100%-2rem)]">{renderChart()}</div>
-      <div className="mt-4 text-sm text-muted-foreground">
+    <Card className="p-4 h-full flex flex-col overflow-hidden">
+      <div className="flex-1 min-h-0">{renderChart()}</div>
+      <div className="mt-4 pt-2 border-t text-sm text-muted-foreground shrink-0">
         {config.type.charAt(0).toUpperCase() + config.type.slice(1)} Chart:{" "}
         {config.title}
       </div>

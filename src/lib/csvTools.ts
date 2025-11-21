@@ -4,6 +4,48 @@ import { CSVData, ChartConfig, ToolResult } from "@/types";
 export class CSVTools {
   private csvData: CSVData | null = null;
 
+  // Tool 0: Get CSV Info
+  async getCSVInfo(): Promise<ToolResult> {
+    if (!this.csvData) {
+      return { success: false, message: "No CSV data loaded" };
+    }
+
+    try {
+      // Get a preview of the data (first 3 rows)
+      const preview = this.csvData.rows
+        .slice(0, 3)
+        .map((row) =>
+          this.csvData!.headers.map(
+            (header, idx) => `${header}: ${row[idx]}`
+          ).join(", ")
+        )
+        .join("\n");
+
+      const info = `CSV Data Summary:
+- Total rows: ${this.csvData.rows.length}
+- Columns (${this.csvData.headers.length}): ${this.csvData.headers.join(", ")}
+
+Preview of first 3 rows:
+${preview}`;
+
+      return {
+        success: true,
+        message: info,
+        data: {
+          rowCount: this.csvData.rows.length,
+          columnCount: this.csvData.headers.length,
+          headers: this.csvData.headers,
+          preview: this.csvData.rows.slice(0, 3),
+        },
+      };
+    } catch (error) {
+      return {
+        success: false,
+        message: `Failed to get CSV info: ${error}`,
+      };
+    }
+  }
+
   // Tool 1: Read CSV
   async readCSV(csvContent: string): Promise<ToolResult> {
     try {
@@ -325,6 +367,13 @@ export class CSVTools {
           ],
         },
       };
+
+      console.log("Chart tool returning:", {
+        success: true,
+        hasChartConfig: true,
+        chartType,
+        title,
+      });
 
       return {
         success: true,

@@ -114,10 +114,10 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="flex flex-col h-screen bg-background">
       {/* Header */}
-      <header className="border-b">
-        <div className="container mx-auto px-4 py-4">
+      <header className="border-b shrink-0">
+        <div className="container px-4 py-4 mx-auto">
           <h1 className="text-2xl font-bold">ChartSheet</h1>
           <p className="text-sm text-muted-foreground">
             AI-powered CSV analytics and visualization
@@ -126,76 +126,84 @@ export default function Home() {
       </header>
 
       {/* Main Content */}
-      <main className="container mx-auto px-4 py-6">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 h-[calc(100vh-12rem)]">
-          {/* Left: Chat Panel */}
-          <div className="flex flex-col h-full">
-            <ChatPanel
-              messages={messages}
-              onSendMessage={handleSendMessage}
-              isLoading={isLoading}
-              hasCSVData={!!csvData}
-            />
-          </div>
+      <main className="flex-1 overflow-hidden">
+        <div className="container h-full px-4 py-6 mx-auto">
+          <div className="grid h-full grid-cols-1 gap-6 lg:grid-cols-2">
+            {/* Left: Chat Panel */}
+            <div className="flex flex-col h-full min-h-0">
+              <ChatPanel
+                messages={messages}
+                onSendMessage={handleSendMessage}
+                isLoading={isLoading}
+                hasCSVData={!!csvData}
+              />
+            </div>
 
-          {/* Right: Data Display */}
-          <div className="flex flex-col h-full">
-            <UploadSection
-              onFileUpload={handleFileUpload}
-              onClear={handleClear}
-              onDownload={handleDownload}
-              hasData={!!csvData}
-              filename={filename}
-            />
+            {/* Right: Data Display */}
+            <div className="flex flex-col h-full min-h-0">
+              <UploadSection
+                onFileUpload={handleFileUpload}
+                onClear={handleClear}
+                onDownload={handleDownload}
+                hasData={!!csvData}
+                filename={filename}
+              />
 
-            {csvData ? (
-              <Tabs
-                value={activeTab}
-                onValueChange={(v) => setActiveTab(v as "table" | "chart")}
-                className="flex-1 flex flex-col"
-              >
-                <TabsList className="w-full">
-                  <TabsTrigger value="table" className="flex-1">
-                    Table View
-                  </TabsTrigger>
-                  <TabsTrigger
-                    value="chart"
-                    className="flex-1"
-                    disabled={!chartConfig}
+              {csvData ? (
+                <Tabs
+                  value={activeTab}
+                  onValueChange={(v) => setActiveTab(v as "table" | "chart")}
+                  className="flex flex-col flex-1 min-h-0 overflow-hidden"
+                >
+                  <TabsList className="w-full shrink-0">
+                    <TabsTrigger value="table" className="flex-1">
+                      Table View
+                    </TabsTrigger>
+                    <TabsTrigger
+                      value="chart"
+                      className="flex-1"
+                      disabled={!chartConfig}
+                    >
+                      Chart View
+                    </TabsTrigger>
+                  </TabsList>
+
+                  <TabsContent
+                    value="table"
+                    className="flex-1 mt-4 overflow-hidden"
                   >
-                    Chart View
-                  </TabsTrigger>
-                </TabsList>
+                    <CSVTableView data={csvData} />
+                  </TabsContent>
 
-                <TabsContent value="table" className="flex-1 mt-4">
-                  <CSVTableView data={csvData} />
-                </TabsContent>
-
-                <TabsContent value="chart" className="flex-1 mt-4">
-                  {chartConfig ? (
-                    <ChartView config={chartConfig} />
-                  ) : (
-                    <Card className="p-8 h-full flex items-center justify-center">
-                      <div className="text-center text-muted-foreground">
-                        <p>No chart generated yet</p>
-                        <p className="text-sm mt-2">
-                          Ask the AI to create a chart from your data
-                        </p>
-                      </div>
-                    </Card>
-                  )}
-                </TabsContent>
-              </Tabs>
-            ) : (
-              <Card className="flex-1 flex items-center justify-center p-8">
-                <div className="text-center text-muted-foreground">
-                  <p className="text-lg mb-2">No data loaded</p>
-                  <p className="text-sm">
-                    Upload a CSV file or try a demo to get started
-                  </p>
-                </div>
-              </Card>
-            )}
+                  <TabsContent
+                    value="chart"
+                    className="flex-1 mt-4 overflow-hidden"
+                  >
+                    {chartConfig ? (
+                      <ChartView config={chartConfig} />
+                    ) : (
+                      <Card className="flex items-center justify-center h-full p-8">
+                        <div className="text-center text-muted-foreground">
+                          <p>No chart generated yet</p>
+                          <p className="mt-2 text-sm">
+                            Ask the AI to create a chart from your data
+                          </p>
+                        </div>
+                      </Card>
+                    )}
+                  </TabsContent>
+                </Tabs>
+              ) : (
+                <Card className="flex items-center justify-center flex-1 p-8">
+                  <div className="text-center text-muted-foreground">
+                    <p className="mb-2 text-lg">No data loaded</p>
+                    <p className="text-sm">
+                      Upload a CSV file or try a demo to get started
+                    </p>
+                  </div>
+                </Card>
+              )}
+            </div>
           </div>
         </div>
       </main>

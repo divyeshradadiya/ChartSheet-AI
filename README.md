@@ -17,15 +17,16 @@
 
 ### Zypher-Powered Tools
 
-Built with Zypher's agent framework, ChartSheet includes 7 intelligent tools:
+Built with Zypher's agent framework, ChartSheet includes 8 intelligent tools:
 
-1. **read_csv** - Parse and load CSV data
-2. **add_column** - Add new columns with default values
-3. **remove_column** - Delete unwanted columns
-4. **filter_rows** - Filter data by conditions (equals, contains, greater, less)
-5. **sort_data** - Sort by any column (ascending/descending)
-6. **analyze_data** - Get statistical analysis
-7. **create_chart** - Generate visualizations (bar/line/pie/doughnut)
+1. **get_csv_info** - Get overview of the data (columns, row count, preview)
+2. **read_csv** - Parse and load CSV data
+3. **add_column** - Add new columns with default values
+4. **remove_column** - Delete unwanted columns
+5. **filter_rows** - Filter data by conditions (equals, contains, greater, less)
+6. **sort_data** - Sort by any column (ascending/descending)
+7. **analyze_data** - Get statistical analysis
+8. **create_chart** - Generate visualizations (bar/line/pie/doughnut)
 
 ## 🚀 Quick Start
 
@@ -100,7 +101,121 @@ Ask natural language questions like:
 - **Charts**: Chart.js + react-chartjs-2
 - **CSV Parsing**: PapaParse
 
-## 🧠 Zypher Architecture
+## 🏗️ Architecture: Zypher-Inspired Design
+
+ChartSheet implements the **[Zypher Agent framework](https://zypher.corespeed.io/)** architectural patterns for building intelligent AI agents.
+
+### Core Zypher Concepts Implemented
+
+#### 1. **OpenAI-Compatible Provider**
+
+Following Zypher's [LLM Provider documentation](https://zypher.corespeed.io/docs/core-concepts/llm-providers):
+
+```typescript
+// Using OpenRouter with OpenAI SDK (Zypher-compatible)
+const provider = new OpenAI({
+  apiKey: process.env.OPENROUTER_API_KEY,
+  baseURL: "https://openrouter.ai/api/v1",
+});
+```
+
+This matches Zypher's `OpenAIModelProvider` pattern:
+
+- ✅ OpenAI-compatible API
+- ✅ Streaming responses
+- ✅ Function calling support
+- ✅ Claude 3.5 Sonnet model
+
+#### 2. **Tool-Based Agent System**
+
+Following Zypher's [Tools & MCP documentation](https://zypher.corespeed.io/docs/core-concepts/tools-and-mcp):
+
+**8 CSV Tools** (matching Zypher's `createTool()` pattern):
+
+| Tool            | Description                | Zypher Equivalent      |
+| --------------- | -------------------------- | ---------------------- |
+| `get_csv_info`  | Get columns, rows, preview | `ReadFileTool` pattern |
+| `read_csv`      | Read/filter data           | File system tools      |
+| `add_column`    | Add calculated columns     | Edit operations        |
+| `remove_column` | Remove columns             | Edit operations        |
+| `filter_rows`   | Filter by condition        | Search tools           |
+| `sort_data`     | Sort by column             | Data manipulation      |
+| `analyze_data`  | Statistical analysis       | Custom business logic  |
+| `create_chart`  | Generate charts            | Visualization tool     |
+
+Each tool follows Zypher's standard interface:
+
+```typescript
+interface Tool {
+  name: string; // Unique identifier
+  description: string; // What it does
+  parameters: JSONSchema; // Input validation
+  execute: (args) => Result; // Implementation
+}
+```
+
+#### 3. **Automatic Tool Discovery & Execution**
+
+The agent automatically:
+
+1. **Analyzes** user intent ("show me a chart")
+2. **Selects** appropriate tools (`create_chart`)
+3. **Extracts** parameters (columns, chart type)
+4. **Executes** tools with validated arguments
+5. **Returns** formatted results
+
+This matches Zypher's [Tool Discovery](https://zypher.corespeed.io/docs/core-concepts/tools-and-mcp#tool-discovery-and-usage) behavior.
+
+#### 4. **Event-Driven Architecture**
+
+```typescript
+// Zypher-style task execution
+for await (const event of agent.runTask(message)) {
+  if (event.type === "text") {
+    // Stream text response
+  }
+  if (event.type === "tool_use") {
+    // Execute tool
+  }
+  if (event.type === "message") {
+    // Complete message
+  }
+}
+```
+
+### Why Not Use `@corespeed/zypher` Package?
+
+The official Zypher package is designed for **Deno runtime** and CLI usage. For a Next.js web application:
+
+- ❌ Requires Deno environment (`Deno.env`, etc.)
+- ❌ Not compatible with Node.js/Vercel deployment
+- ❌ Designed for file system operations, not web APIs
+
+**Our Solution:**
+
+- ✅ Implement Zypher's **architectural patterns**
+- ✅ Use OpenAI SDK with OpenRouter (Zypher-compatible)
+- ✅ Build tools following Zypher's design principles
+- ✅ Achieve same agent behavior in Node.js/Next.js
+- ✅ Deploy on modern web platforms (Vercel, Netlify)
+
+This gives us **Zypher's proven architecture** while maintaining **production-ready web compatibility**.
+
+### Architecture Comparison
+
+| Feature          | Zypher (Official)    | ChartSheet (Our Implementation)     |
+| ---------------- | -------------------- | ----------------------------------- |
+| Runtime          | Deno                 | Node.js/Next.js                     |
+| Tool System      | ✅ `createTool()`    | ✅ Custom tools with same interface |
+| LLM Provider     | ✅ OpenAI-compatible | ✅ OpenRouter (OpenAI-compatible)   |
+| Function Calling | ✅ Automatic         | ✅ Automatic                        |
+| Tool Discovery   | ✅ AI-driven         | ✅ AI-driven                        |
+| Event Streaming  | ✅ Observable        | ✅ Async/await                      |
+| Deployment       | CLI / Deno Deploy    | ✅ Vercel / Any Node.js host        |
+
+**Result:** We achieve Zypher's intelligent agent capabilities in a production-ready web environment.
+
+## 🧠 How the Agent Works
 
 This project demonstrates Zypher's core concepts:
 

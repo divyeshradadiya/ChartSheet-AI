@@ -21,6 +21,18 @@ export class ZypherAgent {
       {
         type: "function",
         function: {
+          name: "get_csv_info",
+          description:
+            "Get information about the current CSV data including column names, row count, and a preview of the data. Use this when user asks 'what is this data about' or wants to know what columns are available.",
+          parameters: {
+            type: "object",
+            properties: {},
+          },
+        },
+      },
+      {
+        type: "function",
+        function: {
           name: "read_csv",
           description:
             "Read and parse a CSV file content. This must be called first before any other operations.",
@@ -179,6 +191,8 @@ export class ZypherAgent {
     const { name, arguments: args } = toolCall;
 
     switch (name) {
+      case "get_csv_info":
+        return await this.csvTools.getCSVInfo();
       case "read_csv":
         return await this.csvTools.readCSV(args.csvContent);
       case "add_column":
@@ -218,6 +232,24 @@ export class ZypherAgent {
     csvContent?: string
   ): Promise<{ messages: Message[]; csvData?: any; chartConfig?: any }> {
     try {
+      // Parse CSV first to get column information
+      let csvInfo = "";
+      if (csvContent && this.csvTools.getCurrentData() === null) {
+        const parseResult = await this.csvTools.readCSV(csvContent);
+        if (parseResult.success && parseResult.csvData) {
+          csvInfo = `\n\nCurrent CSV has ${
+            parseResult.csvData.rows.length
+          } rows and the following columns:\n${parseResult.csvData.headers.join(
+            ", "
+          )}`;
+        }
+      } else if (this.csvTools.getCurrentData()) {
+        const currentData = this.csvTools.getCurrentData();
+        csvInfo = `\n\nCurrent CSV has ${
+          currentData!.rows.length
+        } rows and the following columns:\n${currentData!.headers.join(", ")}`;
+      }
+
       // Convert messages to OpenAI format
       const openaiMessages = messages.map((msg) => ({
         role: msg.role,
@@ -225,19 +257,25 @@ export class ZypherAgent {
       }));
 
       // Add system message if CSV content is provided
-      if (csvContent) {
+      if (csvContent || this.csvTools.getCurrentData()) {
         openaiMessages.unshift({
           role: "system",
-          content: `You are ChartSheet AI, an expert data analyst assistant. You help users analyze, manipulate, and visualize CSV data.
+          content: `You are ChartSheet AI, an expert data analyst assistant. You help users analyze, manipulate, and visualize CSV data.${csvInfo}
 
-Current CSV data is loaded. Available tools:
-- read_csv: Parse CSV content (already done if CSV is loaded)
+Available tools:
+- get_csv_info: Get details about the CSV (columns, row count, preview) - USE THIS when user asks "what is this data about"
 - add_column: Add a new column
 - remove_column: Remove a column
-- filter_rows: Filter rows by condition
-- sort_data: Sort by column
-- analyze_data: Get statistics
+- filter_rows: Filter rows by condition (operators: equals, contains, greater, less)
+- sort_data: Sort by column (asc/desc)
+- analyze_data: Get statistics (mean, max, min for numbers; distribution for categories)
 - create_chart: Create visualizations (bar, line, pie, doughnut)
+
+When user asks about the data:
+- Use get_csv_info to see what the data contains
+- Explain what columns exist and what they contain based on the preview
+- Use analyze_data to get deeper insights on specific columns
+- Reference the actual column names and values in your response
 
 When user asks to visualize or chart data:
 1. Use create_chart tool with appropriate parameters
@@ -274,9 +312,26 @@ Be conversational and helpful. Explain what you're doing.`,
         // Execute all tool calls
         const toolResults = await Promise.all(
           assistantMessage.tool_calls.map(async (toolCall: any) => {
+            // Parse arguments, handle empty/undefined for tools with no params
+            let args = {};
+            if (
+              toolCall.function.arguments &&
+              toolCall.function.arguments !== "undefined"
+            ) {
+              try {
+                args = JSON.parse(toolCall.function.arguments);
+              } catch (e) {
+                console.error(
+                  "Failed to parse tool arguments:",
+                  toolCall.function.arguments
+                );
+                args = {};
+              }
+            }
+
             const result = await this.executeTool({
               name: toolCall.function.name,
-              arguments: JSON.parse(toolCall.function.arguments),
+              arguments: args,
             });
 
             return {
@@ -287,29 +342,77 @@ Be conversational and helpful. Explain what you're doing.`,
         );
 
         // Add tool results to messages
+        // Format tool results as 'tool' role messages immediately after the assistant tool_use
         const toolMessages = toolResults.map(({ toolCall, result }) => ({
           role: "tool" as const,
-          content: JSON.stringify(result),
           tool_call_id: toolCall.id,
+          content: JSON.stringify(result),
         }));
 
         // Get next response
-        response = await this.openai.chat.completions.create({
-          model: this.model,
-          messages: [
-            ...openaiMessages,
-            assistantMessage,
-            ...toolMessages,
-          ] as any,
-          tools: this.getToolDefinitions() as any,
-          tool_choice: "auto",
-        });
+        try {
+          console.log("Sending to OpenRouter:", {
+            messageCount: [...openaiMessages, assistantMessage, ...toolMessages]
+              .length,
+            toolMessageCount: toolMessages.length,
+            model: this.model,
+          });
+
+          response = await this.openai.chat.completions.create({
+            model: this.model,
+            messages: [
+              ...openaiMessages,
+              assistantMessage,
+              ...toolMessages,
+            ] as any,
+            tools: this.getToolDefinitions() as any,
+            tool_choice: "auto",
+          });
+        } catch (apiError: any) {
+          console.error("OpenRouter API Error Details:", {
+            status: apiError.status,
+            message: apiError.message,
+            error: apiError.error,
+            code: apiError.code,
+            response: apiError.response?.data,
+          });
+
+          // If OpenRouter fails, return what we have so far with error message
+          const toolResultMessages = toolResults
+            .filter((tr) => tr.result.message)
+            .map((tr) => tr.result.message)
+            .join("\n\n");
+
+          return {
+            messages: [
+              ...newMessages,
+              {
+                role: "assistant",
+                content:
+                  toolResultMessages ||
+                  "I encountered an API error while processing your request. Please try again.",
+              },
+            ],
+            csvData: this.csvTools.getCurrentData(),
+          };
+        }
 
         assistantMessage = response.choices[0].message;
 
         // Check for chart or CSV data in tool results
         const chartResult = toolResults.find((r) => r.result.chartConfig);
         const csvResult = toolResults.find((r) => r.result.csvData);
+
+        console.log(
+          "Tool results:",
+          toolResults.map((r) => ({
+            success: r.result.success,
+            hasChartConfig: !!r.result.chartConfig,
+            hasCsvData: !!r.result.csvData,
+          }))
+        );
+        console.log("Chart result found:", !!chartResult);
+        console.log("ChartConfig:", chartResult?.result.chartConfig);
 
         if (chartResult || csvResult) {
           return {
