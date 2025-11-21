@@ -1,63 +1,202 @@
-import Image from "next/image";
+"use client";
+
+import { useState } from "react";
+import { Card } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Message, CSVData, ChartConfig } from "@/types";
+import ChatPanel from "@/components/ChatPanel";
+import CSVTableView from "@/components/CSVTableView";
+import ChartView from "@/components/ChartView";
+import UploadSection from "@/components/UploadSection";
+import Papa from "papaparse";
 
 export default function Home() {
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [csvData, setCSVData] = useState<CSVData | null>(null);
+  const [csvContent, setCSVContent] = useState<string>("");
+  const [filename, setFilename] = useState<string>("");
+  const [chartConfig, setChartConfig] = useState<ChartConfig | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [activeTab, setActiveTab] = useState<"table" | "chart">("table");
+
+  const handleFileUpload = (content: string, name: string) => {
+    setCSVContent(content);
+    setFilename(name);
+
+    // Parse CSV for immediate display
+    const result = Papa.parse(content, {
+      header: false,
+      skipEmptyLines: true,
+    });
+
+    const data = result.data as string[][];
+    setCSVData({
+      headers: data[0],
+      rows: data.slice(1),
+    });
+
+    setMessages([]);
+    setChartConfig(null);
+  };
+
+  const handleClear = () => {
+    setCSVData(null);
+    setCSVContent("");
+    setFilename("");
+    setMessages([]);
+    setChartConfig(null);
+  };
+
+  const handleDownload = () => {
+    if (!csvData) return;
+
+    const csv = [
+      csvData.headers.join(","),
+      ...csvData.rows.map((row) => row.join(",")),
+    ].join("\n");
+
+    const blob = new Blob([csv], { type: "text/csv" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = filename || "data.csv";
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const handleSendMessage = async (content: string) => {
+    if (!csvContent) return;
+
+    const userMessage: Message = { role: "user", content };
+    const newMessages = [...messages, userMessage];
+    setMessages(newMessages);
+    setIsLoading(true);
+
+    try {
+      const response = await fetch("/api/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          messages: newMessages,
+          csvContent,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to get response");
+      }
+
+      const data = await response.json();
+
+      setMessages(data.messages);
+
+      if (data.csvData) {
+        setCSVData(data.csvData);
+      }
+
+      if (data.chartConfig) {
+        setChartConfig(data.chartConfig);
+        setActiveTab("chart");
+      }
+    } catch (error) {
+      console.error("Error:", error);
+      setMessages([
+        ...newMessages,
+        {
+          role: "assistant",
+          content:
+            "Sorry, I encountered an error processing your request. Please try again.",
+        },
+      ]);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
+    <div className="min-h-screen bg-background">
+      {/* Header */}
+      <header className="border-b">
+        <div className="container mx-auto px-4 py-4">
+          <h1 className="text-2xl font-bold">ChartSheet</h1>
+          <p className="text-sm text-muted-foreground">
+            AI-powered CSV analytics and visualization
           </p>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
+      </header>
+
+      {/* Main Content */}
+      <main className="container mx-auto px-4 py-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 h-[calc(100vh-12rem)]">
+          {/* Left: Chat Panel */}
+          <div className="flex flex-col h-full">
+            <ChatPanel
+              messages={messages}
+              onSendMessage={handleSendMessage}
+              isLoading={isLoading}
+              hasCSVData={!!csvData}
             />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+          </div>
+
+          {/* Right: Data Display */}
+          <div className="flex flex-col h-full">
+            <UploadSection
+              onFileUpload={handleFileUpload}
+              onClear={handleClear}
+              onDownload={handleDownload}
+              hasData={!!csvData}
+              filename={filename}
+            />
+
+            {csvData ? (
+              <Tabs
+                value={activeTab}
+                onValueChange={(v) => setActiveTab(v as "table" | "chart")}
+                className="flex-1 flex flex-col"
+              >
+                <TabsList className="w-full">
+                  <TabsTrigger value="table" className="flex-1">
+                    Table View
+                  </TabsTrigger>
+                  <TabsTrigger
+                    value="chart"
+                    className="flex-1"
+                    disabled={!chartConfig}
+                  >
+                    Chart View
+                  </TabsTrigger>
+                </TabsList>
+
+                <TabsContent value="table" className="flex-1 mt-4">
+                  <CSVTableView data={csvData} />
+                </TabsContent>
+
+                <TabsContent value="chart" className="flex-1 mt-4">
+                  {chartConfig ? (
+                    <ChartView config={chartConfig} />
+                  ) : (
+                    <Card className="p-8 h-full flex items-center justify-center">
+                      <div className="text-center text-muted-foreground">
+                        <p>No chart generated yet</p>
+                        <p className="text-sm mt-2">
+                          Ask the AI to create a chart from your data
+                        </p>
+                      </div>
+                    </Card>
+                  )}
+                </TabsContent>
+              </Tabs>
+            ) : (
+              <Card className="flex-1 flex items-center justify-center p-8">
+                <div className="text-center text-muted-foreground">
+                  <p className="text-lg mb-2">No data loaded</p>
+                  <p className="text-sm">
+                    Upload a CSV file or try a demo to get started
+                  </p>
+                </div>
+              </Card>
+            )}
+          </div>
         </div>
       </main>
     </div>

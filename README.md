@@ -1,33 +1,204 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# ChartSheet - AI-Powered CSV Analytics & Visualization
 
-## Getting Started
+![ChartSheet Demo](https://img.shields.io/badge/Built%20with-Zypher-blue) ![Next.js](https://img.shields.io/badge/Next.js-15-black) ![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue)
 
-First, run the development server:
+**ChartSheet** is an AI-powered data analysis tool built with Zypher Agent framework. Upload CSV files, chat with your data, and generate beautiful visualizations—all without writing a single line of code!
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+## 🎯 Features
+
+### Core Functionality
+
+- **📊 CSV Upload & Parsing** - Upload any CSV file or try demo datasets
+- **💬 AI Chat Interface** - Natural language conversations about your data
+- **📈 Smart Visualizations** - Auto-generate bar, line, pie, and doughnut charts
+- **🔧 Data Manipulation** - Add/remove columns, filter rows, sort data
+- **📉 Statistical Analysis** - Get instant insights (mean, max, min, counts)
+- **💾 Download Results** - Export modified CSV files
+
+### Zypher-Powered Tools
+
+Built with Zypher's agent framework, ChartSheet includes 7 intelligent tools:
+
+1. **read_csv** - Parse and load CSV data
+2. **add_column** - Add new columns with default values
+3. **remove_column** - Delete unwanted columns
+4. **filter_rows** - Filter data by conditions (equals, contains, greater, less)
+5. **sort_data** - Sort by any column (ascending/descending)
+6. **analyze_data** - Get statistical analysis
+7. **create_chart** - Generate visualizations (bar/line/pie/doughnut)
+
+## 🚀 Quick Start
+
+### Prerequisites
+
+- Node.js 18+ installed
+- OpenRouter API key ([Get one here](https://openrouter.ai/keys))
+
+### Installation
+
+1. **Install dependencies**
+
+   ```bash
+   npm install
+   ```
+
+2. **Set up environment variables**
+
+   ```bash
+   cp .env.example .env.local
+   ```
+
+   Edit `.env.local` and add your OpenRouter API key:
+
+   ```env
+   OPENROUTER_API_KEY=your_actual_api_key_here
+   ```
+
+3. **Run the development server**
+
+   ```bash
+   npm run dev
+   ```
+
+4. **Open your browser**
+   Navigate to [http://localhost:3000](http://localhost:3000)
+
+## 📖 How to Use
+
+### 1. Upload Data
+
+- Click **"Upload CSV"** to load your own file
+- Or try a **demo file** (People, Sales, or Expenses data)
+
+### 2. Chat with Your Data
+
+Ask natural language questions like:
+
+- _"Remove the Industry Focus column"_
+- _"Show me a bar chart of net worth by person"_
+- _"Filter for people with net worth greater than 150"_
+- _"Sort by age in descending order"_
+- _"Analyze the Net Worth column"_
+- _"Create a pie chart of nationalities"_
+
+### 3. View Results
+
+- **Table View** - See your data in a clean spreadsheet format
+- **Chart View** - Visualize your data with interactive charts
+
+### 4. Download
+
+- Export modified CSV files with the **Download** button
+
+## 🛠️ Tech Stack
+
+- **Framework**: [Next.js 15](https://nextjs.org/) with App Router
+- **Language**: TypeScript
+- **Styling**: Tailwind CSS + [shadcn/ui](https://ui.shadcn.com/)
+- **AI Agent**: Zypher-inspired architecture
+- **LLM**: Anthropic Claude 3.5 Sonnet (via OpenRouter)
+- **Charts**: Chart.js + react-chartjs-2
+- **CSV Parsing**: PapaParse
+
+## 🧠 Zypher Architecture
+
+This project demonstrates Zypher's core concepts:
+
+```typescript
+// Agent with tools (inspired by Zypher's architecture)
+class ZypherAgent {
+  private tools: Tool[];
+  private llm: LLMProvider;
+
+  async runTask(messages, context) {
+    // 1. LLM analyzes user request
+    // 2. Decides which tools to use
+    // 3. Executes tools with arguments
+    // 4. Returns results to user
+  }
+}
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### Tool System
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Each tool follows a standard interface:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- **Name** - Unique identifier
+- **Description** - What the tool does
+- **Parameters** - Input schema (JSON Schema)
+- **Execute** - Implementation logic
 
-## Learn More
+The agent automatically:
 
-To learn more about Next.js, take a look at the following resources:
+- Selects appropriate tools based on user intent
+- Passes correct arguments to tools
+- Chains multiple tools together
+- Returns formatted results
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## 📁 Project Structure
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```
+chartsheet/
+├── src/
+│   ├── app/
+│   │   ├── api/chat/route.ts       # Chat API endpoint
+│   │   ├── page.tsx                 # Main UI page
+│   │   └── globals.css              # Global styles
+│   ├── components/
+│   │   ├── ChatPanel.tsx            # Chat interface
+│   │   ├── ChatMessage.tsx          # Message bubbles
+│   │   ├── CSVTableView.tsx         # Table display
+│   │   ├── ChartView.tsx            # Chart display
+│   │   ├── UploadSection.tsx        # File upload
+│   │   └── ui/                      # shadcn components
+│   ├── lib/
+│   │   ├── zypherAgent.ts           # Zypher agent implementation
+│   │   ├── csvTools.ts              # CSV manipulation tools
+│   │   └── utils.ts                 # Utility functions
+│   └── types/
+│       └── index.ts                 # TypeScript types
+├── public/
+│   ├── demo-people.csv              # Demo dataset 1
+│   ├── demo-sales.csv               # Demo dataset 2
+│   └── demo-expenses.csv            # Demo dataset 3
+└── README.md
+```
+
+## 🌟 What Makes This Special?
+
+This project goes **beyond the basic Sheet1 demo** with:
+
+1. **Advanced Chart Generation** - Automatically creates visualizations from data
+2. **Smart Tool Chaining** - Agent can combine multiple operations
+3. **Full CRUD Operations** - Add, remove, filter, sort columns
+4. **Statistical Analysis** - Built-in data insights
+5. **Production-Ready UI** - Professional design with Tailwind + shadcn
+6. **Type Safety** - Full TypeScript implementation
+
+## 🔮 Future Enhancements
+
+- [ ] Multiple chart types on same data
+- [ ] Export charts as images
+- [ ] Data aggregation (GROUP BY, SUM, AVG)
+- [ ] Join multiple CSV files
+- [ ] Save/load analysis sessions
+- [ ] Custom AI instructions
+- [ ] Real-time collaboration
+
+## 📝 License
+
+MIT License - feel free to use this project for learning or your own applications!
+
+## 🙏 Acknowledgments
+
+- **CoreSpeed** - For creating the Zypher framework
+- **Anthropic** - For Claude 3.5 Sonnet
+- **Vercel** - For Next.js and hosting
+- **shadcn** - For beautiful UI components
+
+---
+
+**Built with ❤️ using Zypher Agent Framework**
 
 ## Deploy on Vercel
 

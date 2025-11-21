@@ -1,0 +1,13 @@
+Month,Product,Sales,Revenue,Region
+January,Laptop,150,225000,North America
+January,Phone,320,160000,North America
+February,Laptop,180,270000,North America
+February,Phone,290,145000,North America
+March,Laptop,210,315000,North America
+March,Phone,380,190000,North America
+January,Laptop,120,180000,Europe
+January,Phone,280,140000,Europe
+February,Laptop,140,210000,Europe
+February,Phone,310,155000,Europe
+March,Laptop,190,285000,Europe
+March,Phone,350,175000,Europe
