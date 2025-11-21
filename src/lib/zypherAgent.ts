@@ -184,6 +184,28 @@ export class ZypherAgent {
           },
         },
       },
+      {
+        type: "function",
+        function: {
+          name: "add_row",
+          description:
+            "Add a new row to the CSV data with values for each column",
+          parameters: {
+            type: "object",
+            properties: {
+              rowData: {
+                type: "object",
+                description:
+                  "Object with column names as keys and values for the new row",
+                additionalProperties: {
+                  type: "string",
+                },
+              },
+            },
+            required: ["rowData"],
+          },
+        },
+      },
     ];
   }
 
@@ -219,6 +241,8 @@ export class ZypherAgent {
           args.xColumn,
           args.yColumn
         );
+      case "add_row":
+        return await this.csvTools.addRow(args.rowData);
       default:
         return {
           success: false,
@@ -270,6 +294,7 @@ Available tools:
 - sort_data: Sort by column (asc/desc)
 - analyze_data: Get statistics (mean, max, min for numbers; distribution for categories)
 - create_chart: Create visualizations (bar, line, pie, doughnut)
+- add_row: Add a new row with data for each column
 
 When user asks about the data:
 - Use get_csv_info to see what the data contains

@@ -388,6 +388,33 @@ ${preview}`;
     }
   }
 
+  // Tool 8: Add Row
+  async addRow(rowData: Record<string, string>): Promise<ToolResult> {
+    if (!this.csvData) {
+      return { success: false, message: "No CSV data loaded" };
+    }
+
+    try {
+      const newRow: string[] = [];
+      for (const header of this.csvData.headers) {
+        newRow.push(rowData[header] || "");
+      }
+
+      this.csvData.rows.push(newRow);
+
+      return {
+        success: true,
+        message: `New row added successfully`,
+        csvData: this.csvData,
+      };
+    } catch (error) {
+      return {
+        success: false,
+        message: `Failed to add row: ${error}`,
+      };
+    }
+  }
+
   // Get current CSV data
   getCurrentData(): CSVData | null {
     return this.csvData;

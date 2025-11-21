@@ -11,13 +11,13 @@
 - **📊 CSV Upload & Parsing** - Upload any CSV file or try demo datasets
 - **💬 AI Chat Interface** - Natural language conversations about your data
 - **📈 Smart Visualizations** - Auto-generate bar, line, pie, and doughnut charts
-- **🔧 Data Manipulation** - Add/remove columns, filter rows, sort data
+- **🔧 Data Manipulation** - Add/remove columns, add rows, filter rows, sort data
 - **📉 Statistical Analysis** - Get instant insights (mean, max, min, counts)
 - **💾 Download Results** - Export modified CSV files
 
 ### Zypher-Powered Tools
 
-Built with Zypher's agent framework, ChartSheet includes 8 intelligent tools:
+Built with Zypher's agent framework, ChartSheet includes 9 intelligent tools:
 
 1. **get_csv_info** - Get overview of the data (columns, row count, preview)
 2. **read_csv** - Parse and load CSV data
@@ -27,6 +27,7 @@ Built with Zypher's agent framework, ChartSheet includes 8 intelligent tools:
 6. **sort_data** - Sort by any column (ascending/descending)
 7. **analyze_data** - Get statistical analysis
 8. **create_chart** - Generate visualizations (bar/line/pie/doughnut)
+9. **add_row** - Add new rows with data for each column
 
 ## 🚀 Quick Start
 
