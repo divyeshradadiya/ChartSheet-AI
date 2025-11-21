@@ -7,6 +7,7 @@ Use these prompts to test and demo ChartSheet's capabilities.
 ## 📊 People Dataset (demo-people.csv)
 
 ### Basic Operations
+
 ```
 Show me the data
 Remove the Industry Focus column
@@ -16,6 +17,7 @@ Sort by age in ascending order
 ```
 
 ### Filtering
+
 ```
 Filter for Americans only
 Filter for people with net worth greater than 150
@@ -25,6 +27,7 @@ Filter for people older than 70
 ```
 
 ### Analysis
+
 ```
 Analyze the Net Worth column
 Analyze the Age column
@@ -34,6 +37,7 @@ How many people are there?
 ```
 
 ### Charts - Bar
+
 ```
 Show me a bar chart of net worth by person
 Create a bar chart of age by name
@@ -41,6 +45,7 @@ Make a bar chart showing net worth by person
 ```
 
 ### Charts - Pie
+
 ```
 Create a pie chart of nationalities
 Show me a pie chart of net worth distribution
@@ -48,18 +53,21 @@ Make a pie chart of age groups
 ```
 
 ### Charts - Line
+
 ```
 Create a line chart of net worth by age
 Show a line chart of net worth over age
 ```
 
 ### Charts - Doughnut
+
 ```
 Make a doughnut chart of nationalities
 Create a doughnut chart of net worth by person
 ```
 
 ### Complex Queries (Tool Chaining)
+
 ```
 Sort by net worth, then show me the top 5 in a bar chart
 Filter for net worth greater than 150, then show a pie chart
@@ -73,6 +81,7 @@ Analyze net worth, then show me a bar chart
 ## 💰 Sales Dataset (demo-sales.csv)
 
 ### Basic Operations
+
 ```
 Show me the sales data
 Remove the Region column
@@ -81,6 +90,7 @@ Sort by month
 ```
 
 ### Filtering
+
 ```
 Filter for North America only
 Show me only Laptop sales
@@ -90,6 +100,7 @@ Filter for revenue greater than 200000
 ```
 
 ### Analysis
+
 ```
 Analyze the Sales column
 Analyze the Revenue column
@@ -99,6 +110,7 @@ How many regions are there?
 ```
 
 ### Charts
+
 ```
 Show me a bar chart of sales by product
 Create a line chart of sales by month
@@ -109,6 +121,7 @@ Make a doughnut chart of product distribution
 ```
 
 ### Complex Queries
+
 ```
 Filter for North America, then show sales chart
 Sort by revenue, show top 5 in a bar chart
@@ -121,6 +134,7 @@ Filter for sales > 200, then create a bar chart
 ## 💸 Expenses Dataset (demo-expenses.csv)
 
 ### Basic Operations
+
 ```
 Show me the expenses
 Remove the Description column
@@ -129,6 +143,7 @@ Sort by date
 ```
 
 ### Filtering
+
 ```
 Filter for Rent only
 Show me expenses greater than 5000
@@ -138,6 +153,7 @@ Filter for amounts less than 1000
 ```
 
 ### Analysis
+
 ```
 Analyze the Amount column
 What's the total spending?
@@ -147,6 +163,7 @@ Analyze the Category column
 ```
 
 ### Charts
+
 ```
 Show me a bar chart of expenses by category
 Create a pie chart of spending by category
@@ -156,6 +173,7 @@ Create a bar chart of amount by date
 ```
 
 ### Complex Queries
+
 ```
 Filter for expenses > 5000, then show a pie chart
 Sort by amount, show top 5 categories as a bar chart
@@ -168,12 +186,14 @@ Filter for January, then create expense chart
 ## 🎯 Demo Script for Video
 
 ### Intro (30 sec)
+
 ```
 [Show homepage]
 "This is ChartSheet - an AI-powered CSV analytics tool built with Zypher Agent framework."
 ```
 
 ### Act 1: Upload (1 min)
+
 ```
 [Click "People Data" button]
 [Table appears]
@@ -181,6 +201,7 @@ Filter for January, then create expense chart
 ```
 
 ### Act 2: Basic Chat (2 min)
+
 ```
 Type: "Remove the Industry Focus column"
 [Shows column removed]
@@ -192,6 +213,7 @@ Type: "Sort by net worth in descending order"
 ```
 
 ### Act 3: The Magic - Charts! (3 min) ⭐
+
 ```
 Type: "Show me a bar chart of net worth by person"
 [Chart tab activates, beautiful bar chart appears]
@@ -208,6 +230,7 @@ Type: "Make a line chart of net worth by age"
 ```
 
 ### Act 4: Advanced Features (2 min)
+
 ```
 Type: "Filter for people with net worth greater than 150"
 [Table filters]
@@ -222,6 +245,7 @@ Type: "Sort by age, filter for people over 60, then show a bar chart"
 ```
 
 ### Act 5: Other Datasets (2 min)
+
 ```
 [Click Clear]
 [Load Sales Data]
@@ -238,6 +262,7 @@ Type: "Create a pie chart of spending by category"
 ```
 
 ### Act 6: UI Tour (1 min)
+
 ```
 [Show Upload button]
 [Show Download button]
@@ -249,6 +274,7 @@ Type: "Create a pie chart of spending by category"
 ```
 
 ### Conclusion (30 sec)
+
 ```
 "ChartSheet demonstrates Zypher's tool-based architecture with 7 intelligent tools:
 - CSV parsing
@@ -275,6 +301,7 @@ Built in less than a day using Zypher Agent framework."
 5. **Pacing**: Slow enough to follow, fast enough to keep interest
 
 ### Do's ✅
+
 - Show typing in real-time
 - Wait for responses to complete
 - Point out impressive features
@@ -282,6 +309,7 @@ Built in less than a day using Zypher Agent framework."
 - Highlight the UI quality
 
 ### Don'ts ❌
+
 - Don't rush through features
 - Don't skip the chart generation
 - Don't forget to show multiple datasets
@@ -295,18 +323,21 @@ Built in less than a day using Zypher Agent framework."
 Before recording demo:
 
 ### Upload & Display
+
 - [ ] Upload custom CSV works
 - [ ] Demo files load correctly
 - [ ] Table displays properly
 - [ ] All 3 demo files tested
 
 ### Chat
+
 - [ ] Messages send/receive
 - [ ] Loading state shows
 - [ ] Suggestions clickable
 - [ ] Error handling works
 
 ### Tools
+
 - [ ] read_csv (automatic on upload)
 - [ ] add_column
 - [ ] remove_column
@@ -316,6 +347,7 @@ Before recording demo:
 - [ ] create_chart (all 4 types)
 
 ### Charts
+
 - [ ] Bar chart generates
 - [ ] Line chart generates
 - [ ] Pie chart generates
@@ -324,6 +356,7 @@ Before recording demo:
 - [ ] Tab switching works
 
 ### UI
+
 - [ ] Responsive design
 - [ ] Download button works
 - [ ] Clear button works
@@ -331,6 +364,7 @@ Before recording demo:
 - [ ] No console errors
 
 ### Edge Cases
+
 - [ ] Empty input handling
 - [ ] Invalid column names
 - [ ] Large CSV files
@@ -344,15 +378,18 @@ Before recording demo:
 When submitting, mention these prompts demonstrate:
 
 1. **Natural Language Understanding**
+
    - "Show me", "Create", "Make", "Filter for"
    - AI understands intent
 
 2. **Tool Variety**
+
    - 7 different tools
    - Automatic selection
    - Proper arguments
 
 3. **Chart Generation** (Your Edge!)
+
    - 4 chart types
    - Automatic data mapping
    - Beautiful visualizations
